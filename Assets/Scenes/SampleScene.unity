@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 293691985}
   - component: {fileID: 293691984}
   m_Layer: 0
-  m_Name: AISprite
+  m_Name: AISprite Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,18 +148,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 293691983}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b4844b0b2592994795fddf1ba066ff5, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f9cd2d9b823b3147ace593605ce91af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
+  damage: 40
   speed: 5
+  minDistance: 0.5
+  minDamageDistance: 0.5
+  minChaseDistance: 5
+  index: 0
+  waitTime: 1
+  player: {fileID: 1274202389}
   waypoint:
   - {fileID: 1571214052}
   - {fileID: 1001159429}
   - {fileID: 1846455668}
-  minDistance: 0.1
-  index: 0
-  minChaseDistance: 3
-  player: {fileID: 1274202389}
+  state: 0
 --- !u!212 &293691985
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -222,7 +227,7 @@ Transform:
   m_LocalScale: {x: 5, y: 5, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
@@ -305,7 +310,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1001159429
 GameObject:
@@ -418,7 +423,7 @@ Transform:
   m_LocalScale: {x: 5, y: 5, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1274202392
 MonoBehaviour:
@@ -485,7 +490,7 @@ Transform:
   - {fileID: 1001159430}
   - {fileID: 1846455669}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1571214052
 GameObject:
@@ -533,7 +538,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1590075939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -560,7 +565,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1846455668
 GameObject:

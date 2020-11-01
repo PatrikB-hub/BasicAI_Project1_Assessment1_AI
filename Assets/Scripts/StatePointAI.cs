@@ -5,48 +5,109 @@ using UnityEngine;
 public class StatePointAI : MonoBehaviour
 {
     #region class variables
-    public float speed = 5f;
-    public GameObject[] Waypoint;
-    public float minDistance = 0.5f;
-    public float chasePlayerDistance = 5f;
-    public int index = 0;
-    public GameObject player;
-    public PlayerController playerController; // == null
+
+    [SerializeField] private float health = 100f;
+    [SerializeField] private float damage = 40f;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float minDistance = 0.5f;
+    [SerializeField] private float minDamageDistance = 0.5f;
+    [SerializeField] private float minChaseDistance = 5f;
+    [SerializeField] private int index = 0;
+    [SerializeField] private float waitTime = 1f;
+
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject[] waypoint;
+
+    public enum State { patrol, chase, flee, wait }
+    public State state;
+
     #endregion
-    public enum State//I added states for our ai
-    {
-        patrol,
-        chase,
-    }
-    public State state;//I added states for our ai
+
     private void Start()
     {
-        playerController = player.GetComponent<PlayerController>();
-        NextState();//I added this line in
+        NextState();
     }
-    //I DELETED UPDATE FROM WAYPOINTAI
-    //CREATE THESE TWO METHODS
-    //patrolState()
-    //chaseState()
-    void Patrol()
+
+    private void Update()
     {
-        float distance = Vector2.Distance(transform.position, Waypoint[index].transform.position);
-        if (distance < minDistance)
-        {
-            index++;
-        }
-        if (index >= Waypoint.Length)
-        {
-            index = 0; ;
-        }
-        //when we reach waypoint
-        //go to next waypoint
-        MoveAI(Waypoint[index].transform.position);
-    }//From WaypointAI
-    void MoveAI(Vector2 targetPosition)
+        CheckTakeDamage(health, damage);
+    }
+
+    #region AI States
+
+    private IEnumerator patrolState()
     {
-        transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-    }//from WaypointAI
+        Debug.Log("Patrol : Enter");
+        while (state == State.patrol)
+        {
+            if (!CanSeePlayer())
+            {
+                Patrol(speed);
+                yield return 0;
+            }
+            else
+            {
+                state = State.chase;
+            }
+        }
+        Debug.Log("Patrol : Exit");
+        NextState();
+    }
+
+    private IEnumerator chaseState()
+    {
+        Debug.Log("Chase : Enter");
+        while (state == State.chase)
+        {
+            ChasePlayer(speed / 2);
+            yield return 0;
+            if (!CanSeePlayer())
+            {
+                state = State.wait;
+            }
+        }
+        Debug.Log("Chase : Exit");
+        NextState();
+    }
+
+    private IEnumerator fleeState()
+    {
+        Debug.Log("Flee : Enter");
+        while (state == State.flee)
+        {
+            FleePlayer(speed * 2);
+            yield return 0;
+        }
+        Debug.Log("Flee : Exit");
+        NextState();
+    }
+
+    private IEnumerator waitState()
+    {
+        Debug.Log("Wait : Enter");
+        Vector3 positionAtStartWaitTime = transform.position;
+        float waitStartTime = Time.time;
+        while (state == State.wait)
+        {
+            Stop(positionAtStartWaitTime);
+
+            if (Time.time > waitStartTime + waitTime)
+            {
+                if (!CanSeePlayer())
+                {
+                    state = State.patrol;
+                }
+            }
+            else if (CanSeePlayer())
+            {
+                state = State.chase;
+            }
+            yield return 0;
+        }
+        Debug.Log("Wait : Exit");
+        NextState();
+    }
+
     private void NextState()
     {
         //work out the name of the method we want to run
@@ -61,4 +122,69 @@ public class StatePointAI : MonoBehaviour
         //Using StartCoroutine() means we can leave and come back to the method that is running
         //All Coroutines must return IEnumerator
     }//from StateMachine
+
+    #endregion
+
+    #region Moving Methods
+
+    private bool CanSeePlayer()
+    {
+        if (Vector2.Distance(player.transform.position, transform.position) > minChaseDistance)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void Patrol(float _patrolSpeed)
+    {
+        float distance = Vector2.Distance(transform.position, waypoint[index].transform.position);
+
+        if (distance < minDistance)
+        {
+            //index = Random.Range(0, waypoint.Length);
+            index++;
+        }
+
+        if (index >= waypoint.Length)
+        {
+            index = 0;
+        }
+
+        MoveAi(waypoint[index].transform.position, _patrolSpeed);
+    }
+
+    public void ChasePlayer(float _chaseSpeed)
+    {
+        MoveAi(player.transform.position, _chaseSpeed);
+    }
+
+    public void FleePlayer(float _fleeSpeed)
+    {
+        MoveAi(-(player.transform.position), _fleeSpeed);
+    }
+
+    void MoveAi(Vector2 targetPosition, float _moveSpeed)
+    {
+        transform.position = Vector2.MoveTowards(transform.position, targetPosition, _moveSpeed * Time.deltaTime);
+    }
+
+    private void Stop(Vector3 _positionAtStartWaitTime)
+    {
+        if (transform.position != _positionAtStartWaitTime)
+        {
+            transform.position = _positionAtStartWaitTime;
+        }
+    }
+
+    public void CheckTakeDamage(float _health, float _damage)
+    {
+        if (Vector2.Distance(player.transform.position, transform.position) < minDamageDistance)
+        {
+            _health -= _damage * Time.deltaTime;
+            health = _health;
+        }
+    }
+
+    #endregion
 }

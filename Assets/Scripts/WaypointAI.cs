@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class WaypointAI : MonoBehaviour
 {
-    public float speed = 5.0f;
 
-    public GameObject[] waypoint;
     public float minDistance;
     public int index = 0;
 
     public float minChaseDistance = 1f;
-
-    public GameObject player;
-
+    /*
     void Update()
     {
         //float distanceBetweenAAndB = Vector2.Distance(A, B);
@@ -32,9 +28,9 @@ public class WaypointAI : MonoBehaviour
         //else
         ////chase the player
         //end if
-    }
+    }*/
 
-    void Patrol()
+    void Patrol(GameObject[] waypoint, float _patrolSpeed)
     {
         float distance = Vector2.Distance(transform.position, waypoint[index].transform.position);
         
@@ -48,13 +44,28 @@ public class WaypointAI : MonoBehaviour
         {
             index = 0;
         }
-        //waypoint.Length
 
-       MoveAi(waypoint[index].transform.position);
+       MoveAi(waypoint[index].transform.position, _patrolSpeed);
     }
 
-    void MoveAi(Vector2 targetPosition)
+    public void ChasePlayer(Transform _chaseTarget, float _chaseSpeed)
     {
-        transform.position = Vector2.MoveTowards(transform.position,targetPosition , speed * Time.deltaTime );
+        MoveAi(_chaseTarget.transform.position, _chaseSpeed);
     }
+
+    public void FleePlayer(Transform _fleeTarget, float _fleeSpeed)
+    {
+        MoveAi(-(_fleeTarget.transform.position), _fleeSpeed);
+    }
+
+    void MoveAi(Vector2 targetPosition, float _moveSpeed)
+    {
+        transform.position = Vector2.MoveTowards(transform.position,targetPosition , _moveSpeed * Time.deltaTime );
+    }
+
+    public void TakeDamage(float _health, float _damage)
+    {
+        _health -= _damage;
+    }
+
 }
