@@ -20,6 +20,8 @@ public class StatePointAI : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject[] waypoint;
 
+    private SpriteRenderer sPRenderer;
+
     public enum State { patrol, chase, flee, wait }
     public State state;
 
@@ -27,6 +29,7 @@ public class StatePointAI : MonoBehaviour
 
     private void Start()
     {
+        sPRenderer = GetComponent<SpriteRenderer>();
         NextState();
     }
 
@@ -43,6 +46,12 @@ public class StatePointAI : MonoBehaviour
         Debug.Log("Patrol : Enter");
         while (state == State.patrol)
         {
+            if (sPRenderer.color != new Color(0, 1, 1))
+            {
+                Color patrolColour = new Color(0, 1, 1);
+                sPRenderer.color = patrolColour;
+            }
+
             // cannot see player then patrol
             if (!CanSeePlayer())
             {
@@ -70,6 +79,12 @@ public class StatePointAI : MonoBehaviour
         Debug.Log("Chase : Enter");
         while (state == State.chase)
         {
+            if (sPRenderer.color != new Color(1, 0.2f, 0))
+            {
+                Color chaseColour = new Color(1, 0.2f, 0);
+                sPRenderer.color = chaseColour;
+            }
+
             if (EnoughHealth())
             {
                 // chase player
@@ -103,6 +118,12 @@ public class StatePointAI : MonoBehaviour
 
     private IEnumerator fleeState()
     {
+        if (sPRenderer.color != new Color(1, 1, 1))
+        {
+            Color fleeColour = new Color(1, 1, 1);
+            sPRenderer.color = fleeColour;
+        }
+
         Debug.Log("Flee : Enter");
         while (state == State.flee)
         {
@@ -129,6 +150,12 @@ public class StatePointAI : MonoBehaviour
 
     private IEnumerator waitState()
     {
+        if (sPRenderer.color != new Color(0, 0, 1))
+        {
+            Color waitColour = new Color(0, 0, 1);
+            sPRenderer.color = waitColour;
+        }
+
         Debug.Log("Wait : Enter");
         Vector3 positionAtStartWaitTime = transform.position;
         // set wait start time
@@ -246,26 +273,33 @@ public class StatePointAI : MonoBehaviour
     /// <param name="_fleeSpeed">speed to move at</param>
     public void FleePlayer(float _fleeSpeed)
     {
+        // find the heading towards the player
         Vector3 heading = player.transform.position - transform.position;
+        // find its magnitude
         float distance = heading.magnitude;
+        // normalise the vector
         Vector3 direction = heading.normalized;
 
+        // depending on the distance to the player move in the opposite direction at a faster or slower speed
         if (distance < 1f)
         {
             Vector3 position = transform.position;
             position += -(direction) * _fleeSpeed * 10f * Time.deltaTime;
+            position.z = 0;
             transform.position = position;
         }
         else if (distance < 10f)
         {
             Vector3 position = transform.position;
             position += -(direction) * _fleeSpeed * 3.5f * Time.deltaTime;
+            position.z = 0;
             transform.position = position;
         }
         else
         {
             Vector3 position = transform.position;
             position += -(direction) * _fleeSpeed * 1.5f * Time.deltaTime;
+            position.z = 0;
             transform.position = position;
         }
     }
